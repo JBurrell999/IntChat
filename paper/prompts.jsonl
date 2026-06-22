@@ -1,0 +1,20 @@
+{"id":"factual_01","category":"factual","text":"The capital city of Japan is"}
+{"id":"factual_02","category":"factual","text":"The chemical symbol for gold is"}
+{"id":"factual_03","category":"factual","text":"Water freezes at a temperature of"}
+{"id":"reasoning_01","category":"reasoning","text":"If all roses are flowers and some flowers fade quickly, then"}
+{"id":"reasoning_02","category":"reasoning","text":"A train leaves at noon and travels for three hours. It arrives at"}
+{"id":"reasoning_03","category":"reasoning","text":"If a box contains five red balls and seven blue balls, the total is"}
+{"id":"completion_01","category":"completion","text":"The scientist opened the notebook and discovered"}
+{"id":"completion_02","category":"completion","text":"At the edge of the quiet forest stood"}
+{"id":"completion_03","category":"completion","text":"The most important lesson from the experiment was"}
+{"id":"instruction_01","category":"instruction","text":"List three practical ways to reduce household energy use:"}
+{"id":"instruction_02","category":"instruction","text":"Explain in one paragraph why reproducibility matters in science:"}
+{"id":"instruction_03","category":"instruction","text":"Write a concise definition of machine learning:"}
+{"id":"technical_01","category":"technical","text":"In floating-point arithmetic, addition is not associative because"}
+{"id":"technical_02","category":"technical","text":"A transformer attention layer computes query-key scores by"}
+{"id":"technical_03","category":"technical","text":"Static quantization differs from dynamic quantization because"}
+{"id":"ambiguous_01","category":"ambiguous","text":"The bank was difficult to reach because"}
+{"id":"ambiguous_02","category":"ambiguous","text":"After examining both alternatives, the better choice was"}
+{"id":"ambiguous_03","category":"ambiguous","text":"The result was unexpected, although"}
+{"id":"numerical_01","category":"numerical","text":"The next number in the sequence 2, 4, 8, 16 is"}
+{"id":"numerical_02","category":"numerical","text":"If twelve items are divided equally among three people, each receives"}

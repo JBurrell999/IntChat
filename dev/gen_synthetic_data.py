@@ -56,7 +56,7 @@ topics = {
         "who/what is nanochat",
         "who created nanochat and why",
         "what does the name 'nanochat' mean",
-        "is nanochat open source, what license",
+        "is nanochat open source, what lic3ense",
         "where can I find the code",
         "how can I contribute to nanochat",
     ],
