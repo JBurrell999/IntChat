@@ -58,6 +58,42 @@ class StaticInt8Linear(nn.Module):
         return output if bias is None else output + bias
 
 
+class DynamicInt8Linear(nn.Module):
+    """W8A8 control with a runtime per-tensor activation scale.
+
+    This deliberately uses floating-point range estimation. It is a control for
+    whether any observed stability comes from integer matmul alone or from the
+    calibration-fixed activation grid used by :class:`StaticInt8Linear`.
+    """
+
+    def __init__(self, layer: nn.Linear):
+        super().__init__()
+        weight = layer.weight.detach().float()
+        weight_scale = _symmetric_scale(weight.abs().amax(dim=1))
+        weight_q = torch.round(weight / weight_scale[:, None]).clamp(-127, 127).to(torch.int8)
+        self.register_buffer("weight_q_t", weight_q.mT.contiguous())
+        self.register_buffer("weight_scale", weight_scale)
+        self.register_buffer("bias", None if layer.bias is None else layer.bias.detach().float())
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        input_shape = x.shape
+        activation_scale = _symmetric_scale(x.detach().abs().amax())
+        x_q = torch.round(x.float() / activation_scale).clamp(-127, 127).to(torch.int8)
+        try:
+            accumulator = torch._int_mm(
+                x_q.reshape(-1, input_shape[-1]).contiguous(), self.weight_q_t
+            )
+        except RuntimeError as error:
+            raise RuntimeError(
+                "This PyTorch/device build does not support the INT8 matrix multiplication "
+                "required by DynamicInt8Linear"
+            ) from error
+        output = accumulator.float() * (activation_scale * self.weight_scale)
+        bias = None if self.bias is None else self.bias.to(x.dtype)
+        output = output.reshape(*input_shape[:-1], self.weight_scale.numel()).to(x.dtype)
+        return output if bias is None else output + bias
+
+
 def attach_linear_calibrators(model: nn.Module) -> list[CalibrationHandle]:
     """Observe each Linear input while the unmodified float model runs."""
     calibrators: list[CalibrationHandle] = []
@@ -86,7 +122,7 @@ def _set_submodule(root: nn.Module, path: str, module: nn.Module) -> None:
 
 
 def convert_calibrated_linears(model: nn.Module, calibrators: Iterable[CalibrationHandle]) -> nn.Module:
-    """Remove observers and replace observed linears with frozen W8A8 simulation."""
+    """Remove observers and replace observed linears with frozen W8A8 layers."""
     calibrators = list(calibrators)
     if not calibrators:
         raise ValueError("no Linear modules were calibrated")
@@ -96,4 +132,17 @@ def convert_calibrated_linears(model: nn.Module, calibrators: Iterable[Calibrati
             raise RuntimeError(f"Linear input was never observed during calibration: {calibration.name}")
         replacement = StaticInt8Linear(calibration.module, calibration.max_abs)
         _set_submodule(model, calibration.name, replacement)
+    return model
+
+
+def convert_dynamic_linears(model: nn.Module) -> nn.Module:
+    """Replace every float Linear with the dynamic-activation W8A8 control."""
+    replacements = [
+        (name, module) for name, module in model.named_modules()
+        if isinstance(module, nn.Linear)
+    ]
+    if not replacements:
+        raise ValueError("model has no Linear modules to quantize")
+    for name, module in replacements:
+        _set_submodule(model, name, DynamicInt8Linear(module))
     return model

@@ -22,24 +22,17 @@ import torch.nn.functional as F
 from nanochat.checkpoint_manager import load_model
 from nanochat.common import compute_init
 from nanochat.engine import KVCache
-from nanochat.static_quant import attach_linear_calibrators, convert_calibrated_linears
-
-
-CALIBRATION_TEXTS = (
-    "The capital of France is Paris.",
-    "Water freezes at zero degrees Celsius.",
-    "A short story begins in a quiet village.",
-    "If five plus seven equals twelve, then",
-    "Machine learning systems transform inputs into outputs.",
-    "The planets orbit the Sun because of gravity.",
-    "Write a polite response to a simple question.",
-    "Reproducibility requires controlling randomness and numerical behavior.",
+from nanochat.static_quant import (
+    attach_linear_calibrators,
+    convert_calibrated_linears,
+    convert_dynamic_linears,
 )
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--precision", required=True, choices=("fp32", "fp16", "static-int8"))
+    parser.add_argument("--precision", required=True, choices=("fp32", "fp16", "bf16", "static-int8", "dynamic-int8"))
+    parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--batch-size", type=int, required=True, choices=(1, 8, 64))
     parser.add_argument("--replicas-per-prompt", type=int, default=10)
     parser.add_argument("--trial", type=int, required=True)
@@ -48,6 +41,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--prompts", type=Path, required=True)
+    parser.add_argument("--calibration-file", type=Path, default=Path("paper/calibration.jsonl"))
+    parser.add_argument("--calibration-samples", type=int, default=32)
     parser.add_argument("--source", choices=("base", "sft", "rl"), default="base")
     parser.add_argument("--model-tag", default=None)
     parser.add_argument("--step", type=int, default=None)
@@ -71,17 +66,27 @@ def load_prompts(path: Path) -> list[dict[str, str]]:
 
 
 def validate_process_dtype(precision: str) -> None:
-    expected = "float16" if precision == "fp16" else "float32"
+    expected = {"fp16": "float16", "bf16": "bfloat16"}.get(precision, "float32")
     actual = os.environ.get("NANOCHAT_DTYPE")
     if actual != expected:
         raise RuntimeError(f"precision={precision} requires NANOCHAT_DTYPE={expected}; got {actual!r}")
 
 
+def load_calibration_texts(path: Path, count: int) -> list[str]:
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if count <= 0 or count > len(records):
+        raise ValueError(f"calibration-samples must be between 1 and {len(records)}")
+    texts = [record["text"] for record in records[:count]]
+    if any(not text.strip() for text in texts):
+        raise ValueError("calibration text cannot be empty")
+    return texts
+
+
 @torch.inference_mode()
-def calibrate_static_int8(model, tokenizer, device) -> None:
+def calibrate_static_int8(model, tokenizer, device, texts: list[str]) -> None:
     calibrators = attach_linear_calibrators(model)
     bos = tokenizer.get_bos_token_id()
-    for text in CALIBRATION_TEXTS:
+    for text in texts:
         ids = torch.tensor([tokenizer.encode(text, prepend=bos)], dtype=torch.long, device=device)
         model(ids)
     convert_calibrated_linears(model, calibrators)
@@ -203,15 +208,28 @@ def main() -> None:
     prompts = load_prompts(args.prompts)
     validate_process_dtype(args.precision)
     _, _, _, _, device = compute_init(args.device_type)
-    if args.precision in {"fp32", "static-int8"}:
+    if args.deterministic:
+        torch.use_deterministic_algorithms(True)
+        torch.backends.cudnn.benchmark = False
+        if device.type == "cuda" and os.environ.get("CUBLAS_WORKSPACE_CONFIG") not in {":4096:8", ":16:8"}:
+            raise RuntimeError("deterministic CUDA runs require CUBLAS_WORKSPACE_CONFIG=:4096:8")
+    if args.precision in {"fp32", "static-int8", "dynamic-int8"}:
         torch.set_float32_matmul_precision("highest")
         if device.type == "cuda":
             torch.backends.cuda.matmul.allow_tf32 = False
     model, tokenizer, meta = load_model(args.source, device, phase="eval", model_tag=args.model_tag, step=args.step)
     model.eval()
-    model.half() if args.precision == "fp16" else model.float()
+    if args.precision == "fp16":
+        model.half()
+    elif args.precision == "bf16":
+        model.bfloat16()
+    else:
+        model.float()
     if args.precision == "static-int8":
-        calibrate_static_int8(model, tokenizer, device)
+        calibration_texts = load_calibration_texts(args.calibration_file, args.calibration_samples)
+        calibrate_static_int8(model, tokenizer, device, calibration_texts)
+    elif args.precision == "dynamic-int8":
+        convert_dynamic_linears(model)
 
     bos = tokenizer.get_bos_token_id()
     tokenized = {item["id"]: tokenizer.encode(item["text"], prepend=bos) for item in prompts}
@@ -221,7 +239,7 @@ def main() -> None:
     }
 
     if args.write_reference:
-        if args.precision != "fp32" or args.batch_size != 1 or args.trial != 0:
+        if args.precision != "fp32" or args.deterministic or args.batch_size != 1 or args.trial != 0:
             raise ValueError("reference creation requires FP32, batch 1, trial 0")
         references = {}
         for item in prompts:
@@ -280,12 +298,15 @@ def main() -> None:
         "schema_version": 2,
         "condition": {
             "precision": args.precision, "batch_size": args.batch_size,
+            "method": args.precision + ("-det" if args.deterministic else ""),
+            "deterministic": args.deterministic,
             "trial": args.trial, "prompts": len(prompts),
             "replicas_per_prompt": args.replicas_per_prompt,
             "generations": generations, "decode": args.decode,
             "temperature": args.temperature, "seed": args.seed,
             "max_tokens": args.max_tokens, "source": args.source,
             "model_tag": args.model_tag, "step": args.step,
+            "calibration_samples": args.calibration_samples if args.precision == "static-int8" else None,
         },
         "aggregate": {
             "generation": mean_metrics(prompt_records, "generation"),
@@ -296,7 +317,7 @@ def main() -> None:
         "prompt_records": prompt_records,
         "environment": environment_metadata(device),
         "model_config": meta["model_config"],
-        "prototype_note": "static-int8 uses INT8 linear matmuls; nonlinear, residual, and dequantization operations remain floating point",
+        "prototype_note": "INT8 modes quantize linear matmuls only; nonlinear, residual, and dequantization operations remain floating point",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

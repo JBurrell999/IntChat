@@ -57,21 +57,21 @@ def main() -> None:
     parser.add_argument("results_dir", type=Path)
     args = parser.parse_args()
     paths = sorted(args.results_dir.glob("*_b*_trial*.json"))
-    if len(paths) != 45:
-        raise RuntimeError(f"expected 45 completed trial files, found {len(paths)}")
+    if not paths:
+        raise FileNotFoundError("no trial files found")
     trials = [json.loads(path.read_text(encoding="utf-8")) for path in paths]
     groups = defaultdict(list)
     for trial in trials:
         condition = trial["condition"]
-        groups[(condition["precision"], condition["batch_size"])].append(trial)
+        groups[(condition.get("method", condition["precision"]), condition["batch_size"])].append(trial)
 
     rows = []
-    order = {"fp32": 0, "fp16": 1, "static-int8": 2}
-    for (precision, batch_size), condition_trials in sorted(groups.items(), key=lambda item: (order[item[0][0]], item[0][1])):
+    order = {"fp32": 0, "fp32-det": 1, "fp16": 2, "fp16-det": 3, "bf16": 4, "static-int8": 5, "dynamic-int8": 6}
+    for (method, batch_size), condition_trials in sorted(groups.items(), key=lambda item: (order.get(item[0][0], 99), item[0][1])):
         if len(condition_trials) != 5:
-            raise RuntimeError(f"{precision}/batch{batch_size} has {len(condition_trials)} trials, expected 5")
+            raise RuntimeError(f"{method}/batch{batch_size} has {len(condition_trials)} trials, expected 5")
         summaries = summarize_prompts(condition_trials)
-        row = {"precision": precision, "batch_size": batch_size, "generations": 1000}
+        row = {"method": method, "batch_size": batch_size, "generations": 1000}
         for metric in METRICS:
             estimate, low, high = cluster_interval(summaries, metric)
             row[metric] = estimate
@@ -87,7 +87,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
 
-    table_fields = ("precision", "batch_size", "generations", "unique_outputs", "reference_match_rate", "logit_abs_max", "kl_mean")
+    table_fields = ("method", "batch_size", "generations", "unique_outputs", "reference_match_rate", "logit_abs_max", "kl_mean")
     header = "| " + " | ".join(table_fields) + " |"
     separator = "|" + "|".join("---" for _ in table_fields) + "|"
     body = []

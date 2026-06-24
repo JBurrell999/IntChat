@@ -18,7 +18,7 @@ support claims of cross-platform bitwise determinism or integer-only execution.
    - Position: quantization should be studied as a reproducibility mechanism,
      not only a compression/throughput mechanism.
    - Contributions: motivation, prior-art synthesis, NanoChat W8A8 prototype,
-     and controlled preliminary measurements.
+     and controlled measurements with deterministic and dynamic controls.
 
 2. **Motivation and problem statement — 1.0 page**
    - Define determinism, repeatability, reproducibility, and semantic stability.
@@ -41,10 +41,13 @@ support claims of cross-platform bitwise determinism or integer-only execution.
    - Model and checkpoint identification.
    - FP32: literal FP32 with TF32 disabled.
    - FP16: NanoChat's explicit float16 compute path.
+   - BF16: native GH200 inference format.
    - Static INT8 prototype: symmetric INT8; per-output-channel weights,
      per-layer activation scale; eight fixed calibration strings;
      INT8×INT8→INT32 linear execution using PyTorch; no custom kernels.
    - Explain why this isolates grid snapping but is not integer-only inference.
+   - Dynamic W8A8 control: identical integer matmul with runtime activation
+     scaling, separating integer arithmetic from fixed-scale effects.
 
 5. **Experimental protocol — 1.0 page**
    - Batch sizes 1, 8, 64; exactly 1,000 generations per condition:
@@ -54,6 +57,10 @@ support claims of cross-platform bitwise determinism or integer-only execution.
    - Fixed-sample secondary experiment uses pre-generated CPU uniforms shared
      by every replica, avoiding batch-dependent RNG consumption.
    - FP32 batch-1 teacher-forced trace is the common reference.
+   - Deterministic FP32/FP16 controls use PyTorch deterministic algorithms and
+     a fixed cuBLAS workspace configuration.
+   - Held-out validation BPB measures fidelity; calibration sizes 1/8/32 form
+     a prespecified static-scale sensitivity analysis.
    - Every launch uses the declared physical batch shape; padded rows are
      discarded rather than silently changing the final batch size.
    - Hardware/software details, package versions, Git state, prompt manifest,
@@ -89,6 +96,8 @@ support claims of cross-platform bitwise determinism or integer-only execution.
   than FP16 under the same batch perturbations.
 - H3: static W8A8 may improve reference-match rate while increasing
   KL divergence from FP32. This tradeoff separates reproducibility from fidelity.
+- H4: static W8A8 is more stable than dynamic W8A8 if scale freezing, rather
+  than integer matmul alone, is the relevant reproducibility mechanism.
 
 H2 is the central hypothesis. H1 is a sanity check. H3 prevents a misleading
 conclusion in which a stable but badly distorted model is called better.
@@ -99,7 +108,11 @@ conclusion in which a stable but badly distorted model is called better.
 |---|---:|---:|---|
 | FP32 | 1, 8, 64 | 1,000 each | greedy |
 | FP16 | 1, 8, 64 | 1,000 each | greedy |
+| BF16 | 1, 8, 64 | 1,000 each | greedy |
+| Deterministic FP32 | 1, 8, 64 | 1,000 each | greedy |
+| Deterministic FP16 | 1, 8, 64 | 1,000 each | greedy |
 | Static W8A8 linear | 1, 8, 64 | 1,000 each | greedy |
+| Dynamic W8A8 linear | 1, 8, 64 | 1,000 each | greedy |
 
 Repeat the complete matrix with `fixed-sample` as a secondary experiment. The
 prompt manifest is fixed in `paper/prompts.jsonl` and must be archived unchanged.
@@ -117,13 +130,20 @@ prompt manifest is fixed in `paper/prompts.jsonl` and must be archived unchanged
 Primary conference experiment:
 
 ```bash
-MODEL_TAG=d12 STEP=19000 TRIALS=5 REPLICAS_PER_PROMPT=10 MAX_TOKENS=32 DECODE=greedy \
+MODEL_TAG=paper-d12 STEP=2520 TRIALS=5 REPLICAS_PER_PROMPT=10 MAX_TOKENS=32 DECODE=greedy \
   OUT=repro_results/greedy bash runs/reproducibility.sh
 ```
 
 Secondary experiment:
 
 ```bash
-MODEL_TAG=d12 STEP=19000 TRIALS=5 REPLICAS_PER_PROMPT=10 MAX_TOKENS=32 DECODE=fixed-sample \
+MODEL_TAG=paper-d12 STEP=2520 TRIALS=5 REPLICAS_PER_PROMPT=10 MAX_TOKENS=32 DECODE=fixed-sample \
   OUT=repro_results/fixed_sample bash runs/reproducibility.sh
+```
+
+Held-out quality and calibration ablation:
+
+```bash
+MODEL_TAG=paper-d12 STEP=2520 OUT=repro_results/quality \
+  bash runs/quality_eval.sh
 ```

@@ -1,6 +1,12 @@
 import torch
 
-from nanochat.static_quant import StaticInt8Linear, attach_linear_calibrators, convert_calibrated_linears
+from nanochat.static_quant import (
+    DynamicInt8Linear,
+    StaticInt8Linear,
+    attach_linear_calibrators,
+    convert_calibrated_linears,
+    convert_dynamic_linears,
+)
 
 
 def test_static_quant_freezes_integer_weights_and_activation_scale():
@@ -45,3 +51,15 @@ def test_tiny_nanochat_model_can_be_calibrated_and_converted():
     assert first.shape == (1, 3, 32)
     assert torch.equal(first, second)
     assert any(isinstance(module, StaticInt8Linear) for module in model.modules())
+
+
+def test_dynamic_int8_control_uses_integer_weights():
+    torch.manual_seed(9)
+    float_layer = torch.nn.Linear(16, 8, bias=False)
+    model = torch.nn.Sequential(float_layer)
+    x = torch.randn(4, 16)
+    expected = model(x)
+    convert_dynamic_linears(model)
+    assert isinstance(model[0], DynamicInt8Linear)
+    assert model[0].weight_q_t.dtype == torch.int8
+    torch.testing.assert_close(model(x), expected, atol=0.04, rtol=0.08)
