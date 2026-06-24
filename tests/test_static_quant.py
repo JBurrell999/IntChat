@@ -11,14 +11,22 @@ from nanochat.static_quant import (
 
 def test_static_quant_freezes_integer_weights_and_activation_scale():
     torch.manual_seed(7)
-    model = torch.nn.Sequential(torch.nn.Linear(4, 3), torch.nn.ReLU(), torch.nn.Linear(3, 2))
+    model = torch.nn.Sequential(torch.nn.Linear(16, 8), torch.nn.ReLU(), torch.nn.Linear(8, 8))
     calibration = attach_linear_calibrators(model)
-    model(torch.randn(8, 4))
+    model(torch.randn(8, 16))
     convert_calibrated_linears(model, calibration)
     assert isinstance(model[0], StaticInt8Linear)
     assert isinstance(model[2], StaticInt8Linear)
     assert model[0].weight_q_t.dtype == torch.int8
     assert model[0].activation_scale.item() > 0
+
+
+def test_unaligned_auxiliary_linear_stays_float():
+    model = torch.nn.Sequential(torch.nn.Linear(24, 1, bias=False))
+    calibration = attach_linear_calibrators(model)
+    assert calibration == []
+    convert_dynamic_linears(model)
+    assert isinstance(model[0], torch.nn.Linear)
 
 
 def test_static_quant_output_is_repeatable_and_close():
@@ -36,9 +44,14 @@ def test_static_quant_output_is_repeatable_and_close():
     torch.testing.assert_close(first, expected, atol=0.04, rtol=0.08)
 
 
-def test_tiny_nanochat_model_can_be_calibrated_and_converted():
+def test_tiny_nanochat_model_can_be_calibrated_and_converted(monkeypatch):
+    # On Hopper machines nanochat auto-selects CUDA-only FlashAttention 3 at
+    # import time. This test intentionally keeps its tiny model on CPU, so force
+    # the portable SDPA path for this test only.
+    import nanochat.flash_attention as flash_attention_module
     from nanochat.gpt import GPT, GPTConfig
 
+    monkeypatch.setattr(flash_attention_module, "USE_FA3", False)
     config = GPTConfig(sequence_len=8, vocab_size=32, n_layer=1, n_head=2, n_kv_head=1, n_embd=24)
     model = GPT(config)
     model.init_weights()

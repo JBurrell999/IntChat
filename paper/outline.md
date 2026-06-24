@@ -77,8 +77,9 @@ support claims of cross-platform bitwise determinism or integer-only execution.
 
 7. **Discussion, threats, and roadmap — 1.0 page**
    - A null result is meaningful: same-machine inference may already be stable.
-   - W8A8 applies only to linear layers; nonlinearities, residuals, rotary
-     embeddings, attention softmax, and dequantization remain floating point.
+   - W8A8 applies to aligned core linear layers; tiny auxiliary gates,
+     nonlinearities, residuals, rotary embeddings, attention softmax, and
+     dequantization remain floating point.
    - One prompt/checkpoint/device cannot establish generality.
    - Batch size changes tensor shapes but does not cover software/hardware drift.
    - Quantization error may exceed the floating-point differences it suppresses.

@@ -75,8 +75,9 @@ commit and dirty state, prompt/calibration manifests, package versions, and
 
 ## Claim boundary
 
-The prototype is not an integer-only Transformer. Only linear layers use
-INT8×INT8→INT32 matrix multiplication. Normalization, rotary embeddings,
+The prototype is not an integer-only Transformer. Aligned core linear layers
+use INT8×INT8→INT32 matrix multiplication; NanoChat's tiny unaligned smear and
+value-gate projections remain floating point. Normalization, rotary embeddings,
 attention softmax, residual operations, and dequantization remain floating
 point. The work evaluates static quantization as a reproducibility primitive;
 it does not propose a new quantization algorithm.

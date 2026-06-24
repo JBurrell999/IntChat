@@ -27,6 +27,16 @@ def _symmetric_scale(max_abs: torch.Tensor, qmax: int = 127) -> torch.Tensor:
     return (max_abs.float() / qmax).clamp_min(torch.finfo(torch.float32).tiny)
 
 
+def is_int8_eligible(module: nn.Linear) -> bool:
+    """Whether the existing CUDA INT8 matmul supports this layer efficiently.
+
+    NanoChat's core projections are aligned. Tiny smear/value-gate projections
+    are not and remain floating point rather than relying on private-kernel
+    behavior for unaligned dimensions.
+    """
+    return module.in_features % 8 == 0 and module.out_features % 8 == 0
+
+
 class StaticInt8Linear(nn.Module):
     """Frozen per-tensor activation/per-output-channel weight W8A8 linear."""
 
@@ -98,7 +108,7 @@ def attach_linear_calibrators(model: nn.Module) -> list[CalibrationHandle]:
     """Observe each Linear input while the unmodified float model runs."""
     calibrators: list[CalibrationHandle] = []
     for name, module in model.named_modules():
-        if not isinstance(module, nn.Linear):
+        if not isinstance(module, nn.Linear) or not is_int8_eligible(module):
             continue
         maximum = torch.zeros((), dtype=torch.float32, device=module.weight.device)
 
@@ -139,10 +149,8 @@ def convert_dynamic_linears(model: nn.Module) -> nn.Module:
     """Replace every float Linear with the dynamic-activation W8A8 control."""
     replacements = [
         (name, module) for name, module in model.named_modules()
-        if isinstance(module, nn.Linear)
+        if isinstance(module, nn.Linear) and is_int8_eligible(module)
     ]
-    if not replacements:
-        raise ValueError("model has no Linear modules to quantize")
     for name, module in replacements:
         _set_submodule(model, name, DynamicInt8Linear(module))
     return model
