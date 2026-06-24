@@ -43,11 +43,13 @@ support claims of cross-platform bitwise determinism or integer-only execution.
    - FP16: NanoChat's explicit float16 compute path.
    - BF16: native GH200 inference format.
    - Static INT8 prototype: symmetric INT8; per-output-channel weights,
-     per-layer activation scale; eight fixed calibration strings;
+     per-layer activation scale; 32 fixed calibration strings;
      INT8×INT8→INT32 linear execution using PyTorch; no custom kernels.
    - Explain why this isolates grid snapping but is not integer-only inference.
    - Dynamic W8A8 control: identical integer matmul with runtime activation
      scaling, separating integer arithmetic from fixed-scale effects.
+   - CUDA compatibility: both W8A8 paths zero-pad decode matmuls below 32
+     rows because PyTorch `_int_mm` rejects matrix heights at or below 16.
 
 5. **Experimental protocol — 1.0 page**
    - Batch sizes 1, 8, 64; exactly 1,000 generations per condition:

@@ -37,6 +37,23 @@ def is_int8_eligible(module: nn.Linear) -> bool:
     return module.in_features % 8 == 0 and module.out_features % 8 == 0
 
 
+def _int_mm(left: torch.Tensor, right: torch.Tensor) -> torch.Tensor:
+    """Run INT8 matmul with CUDA compatibility padding for small decode batches."""
+    rows = left.size(0)
+    if left.is_cuda and rows < 32:
+        padded = torch.zeros((32, left.size(1)), dtype=left.dtype, device=left.device)
+        padded[:rows].copy_(left)
+        left = padded
+    try:
+        output = torch._int_mm(left, right)
+    except RuntimeError as error:
+        raise RuntimeError(
+            "This PyTorch/device build does not support the aligned INT8 matrix "
+            "multiplication required by the W8A8 prototype"
+        ) from error
+    return output[:rows]
+
+
 class StaticInt8Linear(nn.Module):
     """Frozen per-tensor activation/per-output-channel weight W8A8 linear."""
 
@@ -53,15 +70,9 @@ class StaticInt8Linear(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         input_shape = x.shape
         x_q = torch.round(x.float() / self.activation_scale).clamp(-127, 127).to(torch.int8)
-        try:
-            accumulator = torch._int_mm(
-                x_q.reshape(-1, input_shape[-1]).contiguous(), self.weight_q_t
-            )
-        except RuntimeError as error:
-            raise RuntimeError(
-                "This PyTorch/device build does not support the INT8 matrix multiplication "
-                "required by StaticInt8Linear"
-            ) from error
+        accumulator = _int_mm(
+            x_q.reshape(-1, input_shape[-1]).contiguous(), self.weight_q_t
+        )
         output = accumulator.float() * (self.activation_scale * self.weight_scale)
         bias = None if self.bias is None else self.bias.to(x.dtype)
         output = output.reshape(*input_shape[:-1], self.weight_scale.numel()).to(x.dtype)
@@ -89,15 +100,9 @@ class DynamicInt8Linear(nn.Module):
         input_shape = x.shape
         activation_scale = _symmetric_scale(x.detach().abs().amax())
         x_q = torch.round(x.float() / activation_scale).clamp(-127, 127).to(torch.int8)
-        try:
-            accumulator = torch._int_mm(
-                x_q.reshape(-1, input_shape[-1]).contiguous(), self.weight_q_t
-            )
-        except RuntimeError as error:
-            raise RuntimeError(
-                "This PyTorch/device build does not support the INT8 matrix multiplication "
-                "required by DynamicInt8Linear"
-            ) from error
+        accumulator = _int_mm(
+            x_q.reshape(-1, input_shape[-1]).contiguous(), self.weight_q_t
+        )
         output = accumulator.float() * (activation_scale * self.weight_scale)
         bias = None if self.bias is None else self.bias.to(x.dtype)
         output = output.reshape(*input_shape[:-1], self.weight_scale.numel()).to(x.dtype)

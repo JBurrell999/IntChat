@@ -81,3 +81,8 @@ value-gate projections remain floating point. Normalization, rotary embeddings,
 attention softmax, residual operations, and dequantization remain floating
 point. The work evaluates static quantization as a reproducibility primitive;
 it does not propose a new quantization algorithm.
+
+PyTorch's CUDA `torch._int_mm` rejects inputs with 16 or fewer rows. Both W8A8
+conditions therefore append zero rows to a height of 32 for smaller decode
+matmuls and slice those rows from the INT32 output. This shared compatibility
+path is included in performance and limitation reporting.
