@@ -103,7 +103,7 @@ def main():
     vals = [rate * 100 for _, rate, _ in rows]
     colors = ["#4c72b0", "#55a868", "#c44e52", "#8172b3"][: len(rows)]
     ax.bar(labels, vals, color=colors)
-    ax.set_ylabel("GPU$\\leftrightarrow$CPU text match (\\%)")
+    ax.set_ylabel("GPU$\\leftrightarrow$CPU text match (%)")
     ax.set_ylim(0, 105)
     ax.set_title(f"Cross-platform generation agreement (batch {args.batch})")
     for i, v in enumerate(vals):

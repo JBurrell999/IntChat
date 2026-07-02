@@ -9,6 +9,8 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \usepackage{xcolor}
 \usepackage{url}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -48,10 +50,13 @@ not scale freezing. Third, a \emph{tradeoff}: this invariance comes from
 computing a \emph{different, lower-fidelity} function---static W8A8 matches the
 FP32 reference on 0\% of prompts and raises validation bits-per-byte from 0.8395
 to 0.8752. Finally, a CPU replication shows the invariance does \emph{not} extend
-across platforms, because normalization, softmax, rotary embeddings, and
-dequantization remain floating point. We conclude that quantization can deliver
-exact numerical batch-invariance but not, in this prototype, cross-platform
-determinism, and we frame integer-only NanoChat inference as the follow-on work.
+across platforms and in fact reverses: FP32 reproduces the same text on 100\% of
+prompts across GPU and CPU, whereas static W8A8 reproduces only 25\%, because the
+normalization, softmax, rotary, and dequantization operations remain floating
+point and INT8 rounding sits near decision boundaries. We conclude that
+quantization can deliver exact numerical batch-invariance \emph{within} a device
+but, in this prototype, actively degrades cross-platform determinism, and we frame
+integer-only NanoChat inference as the follow-on work.
 \end{abstract}
 
 \section{Introduction}
@@ -158,6 +163,24 @@ dequantizes the \texttt{int32} accumulator. The \emph{dynamic W8A8} control uses
 the identical integer matmul but re-estimates the activation scale at runtime;
 comparing the two isolates whether any stability comes from the fixed grid or
 from integer arithmetic alone.
+
+\begin{algorithm}[t]
+\caption{Static W8A8 linear (per-channel weights, per-tensor frozen activation).}
+\label{alg:w8a8}
+\footnotesize
+\begin{algorithmic}[1]
+\State \textbf{Calibrate:} run the float model on 32 calibration strings; for each
+eligible linear record $a^{\star}\!=\!\max|x|$ over its observed inputs.
+\State \textbf{Freeze weights:} $s_w \gets \max_{\text{col}}|W| / 127$;\;
+$W_q \gets \mathrm{clip}(\mathrm{round}(W / s_w), -127, 127)$
+\State \textbf{Freeze activation scale:} $s_a \gets a^{\star} / 127$
+\Statex \textbf{Forward}$(x)$:
+\State $x_q \gets \mathrm{clip}(\mathrm{round}(x / s_a), -127, 127)$ \Comment{INT8}
+\State \textbf{if} rows$(x_q)<32$ \textbf{then} zero-pad to 32 rows \Comment{\texttt{\_int\_mm}}
+\State $A \gets \texttt{\_int\_mm}(x_q, W_q^\top)$ \Comment{exact INT32 accumulation}
+\State \Return $A_{[:\text{rows}]} \cdot (s_a s_w) + b$ \Comment{dequantize in FP}
+\end{algorithmic}
+\end{algorithm}
 
 \paragraph{Claim boundary.} Only aligned core projections are quantized
 (in/out features divisible by 8). NanoChat's tiny unaligned smear and value-gate
@@ -272,6 +295,28 @@ four to five orders of magnitude of divergence for exact batch-invariance.}
 \label{fig:kl}
 \end{figure}
 
+\paragraph{Where precision flips tokens.} Reproducibility risk is
+content-dependent (Table~\ref{tab:categories}). Under FP16 and BF16, factual,
+numerical, reasoning, and instruction prompts match the FP32 reference on 100\% of
+cases, while \emph{completion} and \emph{ambiguous} prompts flip most often (BF16
+matches on only 33\% of each). These are prompts whose top logits are nearly tied,
+so a $10^{-2}$-scale perturbation crosses the decision boundary; well-determined
+prompts are unaffected. The static W8A8 column is uniformly zero because it
+computes a different function on every prompt, not because ambiguity drives its
+disagreement. With three prompts per category this is a descriptive signal, not a
+powered test, but it indicates that any deployment-time reproducibility budget
+should be spent on open-ended generation rather than factual recall.
+
+\begin{table}[t]
+\centering
+\caption{Per-category reference-match rate (batch 1). Lower means the precision
+flips more tokens relative to FP32. Completion/ambiguous prompts are most fragile.}
+\label{tab:categories}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\input{tables/categories.tex}
+\end{table}
+
 \begin{table}[t]
 \centering
 \caption{Fidelity ablation: held-out validation BPB over 2.1M tokens.}
@@ -281,23 +326,45 @@ four to five orders of magnitude of divergence for exact batch-invariance.}
 \end{table}
 
 \paragraph{Cross-platform replication (CPU).} To test whether integer-matmul
-invariance extends beyond one device, we replicate the four core methods on a CPU
-platform, where \texttt{\_int\_mm} executes but the surrounding operations use
-entirely different kernels. Table~\ref{tab:crossplatform} reports the GPU$\to$CPU
-comparison. Preliminary single-condition runs show that static W8A8 logits differ
-between GPU and CPU (mean $|\Delta|$ 0.692 on GPU vs.\ 0.695 on CPU), i.e.\
-integer accumulation removes \emph{batch}-dependent variation but not
-\emph{platform}-dependent variation, because dequantization, normalization,
-softmax, and rotary embeddings remain floating point. This is the expected
-negative result and directly motivates full integer-only inference.
+invariance extends beyond one device, we replicate the core methods on a CPU
+platform, where \texttt{\_int\_mm} executes but every surrounding operation uses
+entirely different kernels and reduction orders. We measure the cleanest
+cross-platform outcome available---whether the modal generated \emph{token
+sequence} for each prompt is identical on GPU and CPU---so the comparison needs no
+logit alignment. Table~\ref{tab:crossplatform} and Fig.~\ref{fig:crossplatform}
+report the result, and it is the opposite of the naive expectation. FP32
+reproduces the same text on \textbf{100\%} of prompts across platforms: at full
+precision the GPU$\leftrightarrow$CPU logit gap never crosses an $\arg\max$
+boundary. Agreement then \emph{falls} as precision drops---BF16 85\%, dynamic W8A8
+45\%, and static W8A8 only \textbf{25\%}. Quantization is thus markedly
+\emph{worse} for cross-platform reproducibility than full precision, not better.
+The mechanism is consistent with our within-platform findings: integer
+accumulation removes \emph{batch}-dependent variation, but INT8 rounding places
+many logits near decision boundaries, and the surrounding floating-point
+operations---dequantization, normalization, softmax, rotary embeddings---use
+different kernels and reduction orders on CPU than on GPU. Those two effects
+compound, so the integer paths flip far more tokens across platforms than FP32
+does. This is the central negative result of the paper: exact batch-invariance
+within a device does \emph{not} imply determinism across devices, and in this
+prototype quantization actively degrades it.
 
 \begin{table}[t]
 \centering
-\caption{Cross-platform (GPU vs.\ CPU) replication of the core methods.}
+\caption{Cross-platform replication: fraction of prompts whose modal greedy token
+sequence is identical on GPU and CPU (batch 1).}
 \label{tab:crossplatform}
 \footnotesize
 \input{tables/crossplatform.tex}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig5_crossplatform.pdf}
+\caption{GPU$\leftrightarrow$CPU generation agreement. Full precision is already
+platform-stable at the token level; lower precision diverges. The integer paths'
+remaining floating-point operations prevent bitwise platform invariance.}
+\label{fig:crossplatform}
+\end{figure}
 
 \section{Discussion, Threats, and Roadmap}
 \paragraph{A null result is informative.} For this model on this GPU, greedy
@@ -331,12 +398,16 @@ without the fidelity caveats we currently must attach.
 Studied as a reproducibility primitive rather than a compression trick, static
 W8A8 delivers exactly what integer accumulation promises---logits invariant to
 batch shape---but no more: it is a different, lower-fidelity function, and its
-invariance does not survive a change of hardware platform because most of the
-network is still floating point. On a single modern GPU, greedy inference is
-already batch-invariant at the token level, so the value of quantization here is
-exact numerical, not behavioral, reproducibility. Full integer-only NanoChat
-inference, which could turn this batch-invariance into cross-platform
-determinism, is the natural follow-on work.
+invariance not only fails to survive a change of hardware platform but reverses,
+dropping cross-platform text agreement from 100\% (FP32) to 25\% because most of
+the network is still floating point and INT8 logits sit near decision boundaries.
+On a single modern GPU, greedy inference is already batch-invariant at the token
+level, so the value of quantization here is exact numerical, not behavioral,
+reproducibility. The clear lesson is that batch-invariance and platform-invariance
+are distinct goals, and only the former follows from integer matmul alone.
+Full integer-only NanoChat inference---replacing the remaining floating-point
+islands so that batch-invariance can extend to cross-platform determinism---is the
+natural follow-on work.
 
 {\footnotesize
 \paragraph{Reproducibility.} All checkpoints, manifests, per-condition JSON,

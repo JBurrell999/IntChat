@@ -22,49 +22,56 @@
 \@writefile{toc}{\contentsline {paragraph}{Integer-only Transformers.}{2}{section*.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{LLM post-training quantization.}{2}{section*.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Cross-platform consistency and framework guidance.}{2}{section*.7}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Static W8A8 linear (per-channel weights, per-tensor frozen activation).}}{2}{algorithm.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{alg:w8a8}{{1}{2}{Static W8A8 linear (per-channel weights, per-tensor frozen activation)}{algorithm.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}NanoChat W8A8 Prototype}{2}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Model.}{2}{section*.8}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Arithmetic conditions.}{2}{section*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Claim boundary.}{2}{section*.10}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Protocol}{2}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Outcomes.}{2}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Statistics.}{2}{section*.12}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Greedy matrix (1{,}000 generations per row). $|\Delta |$ is absolute logit difference from the FP32 batch-1 reference; KL is forward KL in nats; BPB is held-out validation fidelity. Static/dynamic W8A8 use calibration 32.}}{3}{table.caption.14}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{tab:main}{{1}{3}{Greedy matrix (1{,}000 generations per row). $|\Delta |$ is absolute logit difference from the FP32 batch-1 reference; KL is forward KL in nats; BPB is held-out validation fidelity. Static/dynamic W8A8 use calibration 32}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {paragraph}{Outcomes.}{3}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Statistics.}{3}{section*.12}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Hypotheses.}{3}{section*.13}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {6}Results}{3}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{A same-machine null result (H1, H2).}{3}{section*.15}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Reference-match rate to the FP32 batch-1 greedy reference. FP32 is exact; FP16/BF16 flip a stable minority of tokens; W8A8 computes a different function.}}{3}{figure.caption.16}\protected@file@percent }
 \newlabel{fig:match}{{1}{3}{Reference-match rate to the FP32 batch-1 greedy reference. FP32 is exact; FP16/BF16 flip a stable minority of tokens; W8A8 computes a different function}{figure.caption.16}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph  {constant} across batch shape.}}{3}{figure.caption.18}\protected@file@percent }
-\newlabel{fig:logit}{{2}{3}{Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph {constant} across batch shape}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {paragraph}{A same-machine null result (H1, H2).}{3}{section*.15}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Exact batch-invariance from integer matmul (nuance).}{3}{section*.17}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Reproducibility is not fidelity (H3).}{3}{section*.19}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph  {constant} across batch shape.}}{4}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:logit}{{2}{4}{Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph {constant} across batch shape}{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Mean forward KL from FP32 batch-1 (log scale). The integer paths trade four to five orders of magnitude of divergence for exact batch-invariance.}}{4}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:kl}{{3}{4}{Mean forward KL from FP32 batch-1 (log scale). The integer paths trade four to five orders of magnitude of divergence for exact batch-invariance}{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {paragraph}{Where precision flips tokens.}{4}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Cross-platform replication (CPU).}{4}{section*.24}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Per-category reference-match rate (batch 1). Lower means the precision flips more tokens relative to FP32. Completion/ambiguous prompts are most fragile.}}{4}{table.caption.22}\protected@file@percent }
+\newlabel{tab:categories}{{2}{4}{Per-category reference-match rate (batch 1). Lower means the precision flips more tokens relative to FP32. Completion/ambiguous prompts are most fragile}{table.caption.22}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Fidelity ablation: held-out validation BPB over 2.1M tokens.}}{4}{table.caption.23}\protected@file@percent }
+\newlabel{tab:fidelity}{{3}{4}{Fidelity ablation: held-out validation BPB over 2.1M tokens}{table.caption.23}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion, Threats, and Roadmap}{4}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A null result is informative.}{4}{section*.27}\protected@file@percent }
 \citation{kim2021ibert,li2023ivit}
 \bibstyle{plainnat}
 \bibdata{references}
 \bibcite{dettmers2022llmint8}{{1}{2022}{{Dettmers et~al.}}{{Dettmers, Lewis, Belkada, and Zettlemoyer}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Mean forward KL from FP32 batch-1 (log scale). The integer paths trade four to five orders of magnitude of divergence for exact batch-invariance.}}{4}{figure.caption.20}\protected@file@percent }
-\newlabel{fig:kl}{{3}{4}{Mean forward KL from FP32 batch-1 (log scale). The integer paths trade four to five orders of magnitude of divergence for exact batch-invariance}{figure.caption.20}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Fidelity ablation: held-out validation BPB over 2.1M tokens.}}{4}{table.caption.21}\protected@file@percent }
-\newlabel{tab:fidelity}{{2}{4}{Fidelity ablation: held-out validation BPB over 2.1M tokens}{table.caption.21}{}}
-\@writefile{toc}{\contentsline {paragraph}{Cross-platform replication (CPU).}{4}{section*.22}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion, Threats, and Roadmap}{4}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{A null result is informative.}{4}{section*.24}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Cross-platform (GPU vs.\ CPU) replication of the core methods.}}{4}{table.caption.23}\protected@file@percent }
-\newlabel{tab:crossplatform}{{3}{4}{Cross-platform (GPU vs.\ CPU) replication of the core methods}{table.caption.23}{}}
-\@writefile{toc}{\contentsline {paragraph}{Threats to validity.}{4}{section*.25}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Roadmap.}{4}{section*.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{4}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{4}{section*.27}\protected@file@percent }
 \bibcite{jacob2018quantization}{{2}{2018}{{Jacob et~al.}}{{Jacob, Kligys, Chen, Zhu, Tang, Howard, Adam, and Kalenichenko}}}
 \bibcite{karpathy2025nanochat}{{3}{2025}{{Karpathy}}{{}}}
 \bibcite{kim2021ibert}{{4}{2021}{{Kim et~al.}}{{Kim, Gholami, Yao, Mahoney, and Keutzer}}}
 \bibcite{li2023ivit}{{5}{2023}{{Li and Gu}}{{}}}
 \bibcite{pytorch_numerical}{{6}{}{{PyTorch Team}}{{}}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Cross-platform replication: fraction of prompts whose modal greedy token sequence is identical on GPU and CPU (batch 1).}}{5}{table.caption.25}\protected@file@percent }
+\newlabel{tab:crossplatform}{{4}{5}{Cross-platform replication: fraction of prompts whose modal greedy token sequence is identical on GPU and CPU (batch 1)}{table.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces GPU$\leftrightarrow $CPU generation agreement. Full precision is already platform-stable at the token level; lower precision diverges. The integer paths' remaining floating-point operations prevent bitwise platform invariance.}}{5}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:crossplatform}{{4}{5}{GPU$\leftrightarrow $CPU generation agreement. Full precision is already platform-stable at the token level; lower precision diverges. The integer paths' remaining floating-point operations prevent bitwise platform invariance}{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {paragraph}{Threats to validity.}{5}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Roadmap.}{5}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{5}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{5}{section*.30}\protected@file@percent }
 \bibcite{pytorch_reproducibility}{{7}{}{{PyTorch Team}}{{}}}
 \bibcite{he2025nondeterminism}{{8}{2025}{{Thinking Machines Lab}}{{}}}
 \bibcite{xiao2023smoothquant}{{9}{2023}{{Xiao et~al.}}{{Xiao, Lin, Seznec, Wu, Demouth, and Han}}}
 \bibcite{yu2022crossplatform}{{10}{2022}{{Yu et~al.}}{{}}}
-\gdef \@abspage@last{5}
+\gdef \@abspage@last{6}

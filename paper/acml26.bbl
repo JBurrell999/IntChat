@@ -1,0 +1,77 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Dettmers et~al.(2022)Dettmers, Lewis, Belkada, and
+  Zettlemoyer]{dettmers2022llmint8}
+Tim Dettmers, Mike Lewis, Younes Belkada, and Luke Zettlemoyer.
+\newblock {LLM.int8()}: 8-bit matrix multiplication for transformers at scale.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2022.
+
+\bibitem[Jacob et~al.(2018)Jacob, Kligys, Chen, Zhu, Tang, Howard, Adam, and
+  Kalenichenko]{jacob2018quantization}
+Benoit Jacob, Skirmantas Kligys, Bo~Chen, Menglong Zhu, Matthew Tang, Andrew
+  Howard, Hartwig Adam, and Dmitry Kalenichenko.
+\newblock Quantization and training of neural networks for efficient
+  integer-arithmetic-only inference.
+\newblock 2018.
+
+\bibitem[Karpathy(2025)]{karpathy2025nanochat}
+Andrej Karpathy.
+\newblock nanochat: The best {ChatGPT} that \$100 can buy.
+\newblock \url{https://github.com/karpathy/nanochat}, 2025.
+
+\bibitem[Kim et~al.(2021)Kim, Gholami, Yao, Mahoney, and Keutzer]{kim2021ibert}
+Sehoon Kim, Amir Gholami, Zhewei Yao, Michael~W. Mahoney, and Kurt Keutzer.
+\newblock {I-BERT}: Integer-only {BERT} quantization.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2021.
+\newblock arXiv:2101.01321.
+
+\bibitem[Li and Gu(2023)]{li2023ivit}
+Zhikai Li and Qingyi Gu.
+\newblock {I-ViT}: Integer-only quantization for efficient vision transformer
+  inference.
+\newblock In \emph{IEEE/CVF International Conference on Computer Vision
+  (ICCV)}, 2023.
+\newblock arXiv:2207.01405.
+
+\bibitem[{PyTorch Team}({\natexlab{a}})]{pytorch_numerical}
+{PyTorch Team}.
+\newblock {PyTorch} documentation: Numerical accuracy.
+\newblock
+  \url{https://docs.pytorch.org/docs/stable/notes/numerical_accuracy.html},
+  {\natexlab{a}}.
+\newblock Accessed 2026.
+
+\bibitem[{PyTorch Team}({\natexlab{b}})]{pytorch_reproducibility}
+{PyTorch Team}.
+\newblock {PyTorch} documentation: Reproducibility.
+\newblock \url{https://docs.pytorch.org/docs/stable/notes/randomness.html},
+  {\natexlab{b}}.
+\newblock Accessed 2026.
+
+\bibitem[{Thinking Machines Lab}(2025)]{he2025nondeterminism}
+{Thinking Machines Lab}.
+\newblock Defeating nondeterminism in {LLM} inference.
+\newblock
+  \url{https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/},
+  2025.
+
+\bibitem[Xiao et~al.(2023)Xiao, Lin, Seznec, Wu, Demouth, and
+  Han]{xiao2023smoothquant}
+Guangxuan Xiao, Ji~Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han.
+\newblock {SmoothQuant}: Accurate and efficient post-training quantization for
+  large language models.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2023.
+
+\bibitem[Yu et~al.(2022)]{yu2022crossplatform}
+Dailan Yu et~al.
+\newblock Post-training quantization for cross-platform learned image
+  compression.
+\newblock \emph{arXiv preprint arXiv:2202.07513}, 2022.
+
+\end{thebibliography}
