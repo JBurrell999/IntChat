@@ -1,0 +1,169 @@
+\begin{thebibliography}{20}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ashkboos et~al.(2024)Ashkboos, Mohtashami, Croci, Li, Cameron, Jaggi,
+  Alistarh, Hoefler, and Hensman]{ashkboos2024quarot}
+Saleh Ashkboos, Amirkeivan Mohtashami, Maximilian~L. Croci, Bo~Li, Pashmina
+  Cameron, Martin Jaggi, Dan Alistarh, Torsten Hoefler, and James Hensman.
+\newblock {QuaRot}: Outlier-free 4-bit inference in rotated {LLMs}.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2024.
+\newblock arXiv:2404.00456.
+
+\bibitem[Dettmers et~al.(2022)Dettmers, Lewis, Belkada, and
+  Zettlemoyer]{dettmers2022llmint8}
+Tim Dettmers, Mike Lewis, Younes Belkada, and Luke Zettlemoyer.
+\newblock {LLM.int8()}: 8-bit matrix multiplication for transformers at scale.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2022.
+
+\bibitem[Dettmers et~al.(2024)Dettmers, Svirschevski, Egiazarian, Kuznedelev,
+  Frantar, Ashkboos, Borzunov, Hoefler, and Alistarh]{dettmers2024spqr}
+Tim Dettmers, Ruslan Svirschevski, Vage Egiazarian, Denis Kuznedelev, Elias
+  Frantar, Saleh Ashkboos, Alexander Borzunov, Torsten Hoefler, and Dan
+  Alistarh.
+\newblock {SpQR}: A sparse-quantized representation for near-lossless {LLM}
+  weight compression.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+\newblock arXiv:2306.03078.
+
+\bibitem[Egiazarian et~al.(2024)Egiazarian, Panferov, Kuznedelev, Frantar,
+  Babenko, and Alistarh]{egiazarian2024aqlm}
+Vage Egiazarian, Andrei Panferov, Denis Kuznedelev, Elias Frantar, Artem
+  Babenko, and Dan Alistarh.
+\newblock Extreme compression of large language models via additive
+  quantization.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2024.
+\newblock arXiv:2401.06118.
+
+\bibitem[Frantar et~al.(2023)Frantar, Ashkboos, Hoefler, and
+  Alistarh]{frantar2023gptq}
+Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh.
+\newblock {GPTQ}: Accurate post-training quantization for generative
+  pre-trained transformers.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2023.
+\newblock arXiv:2210.17323.
+
+\bibitem[Jacob et~al.(2018)Jacob, Kligys, Chen, Zhu, Tang, Howard, Adam, and
+  Kalenichenko]{jacob2018quantization}
+Benoit Jacob, Skirmantas Kligys, Bo~Chen, Menglong Zhu, Matthew Tang, Andrew
+  Howard, Hartwig Adam, and Dmitry Kalenichenko.
+\newblock Quantization and training of neural networks for efficient
+  integer-arithmetic-only inference.
+\newblock In \emph{IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, 2018.
+
+\bibitem[Karpathy(2025)]{karpathy2025nanochat}
+Andrej Karpathy.
+\newblock nanochat: The best {ChatGPT} that \$100 can buy.
+\newblock \url{https://github.com/karpathy/nanochat}, 2025.
+
+\bibitem[Kim et~al.(2021)Kim, Gholami, Yao, Mahoney, and Keutzer]{kim2021ibert}
+Sehoon Kim, Amir Gholami, Zhewei Yao, Michael~W. Mahoney, and Kurt Keutzer.
+\newblock {I-BERT}: Integer-only {BERT} quantization.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2021.
+\newblock arXiv:2101.01321.
+
+\bibitem[Li and Gu(2023)]{li2023ivit}
+Zhikai Li and Qingyi Gu.
+\newblock {I-ViT}: Integer-only quantization for efficient vision transformer
+  inference.
+\newblock In \emph{IEEE/CVF International Conference on Computer Vision
+  (ICCV)}, 2023.
+\newblock arXiv:2207.01405.
+
+\bibitem[Lin et~al.(2024)Lin, Tang, Tang, Yang, Chen, Wang, Xiao, Dang, Gan,
+  and Han]{lin2024awq}
+Ji~Lin, Jiaming Tang, Haotian Tang, Shang Yang, Wei-Ming Chen, Wei-Chen Wang,
+  Guangxuan Xiao, Xingyu Dang, Chuang Gan, and Song Han.
+\newblock {AWQ}: Activation-aware weight quantization for {LLM} compression and
+  acceleration.
+\newblock In \emph{Machine Learning and Systems (MLSys)}, 2024.
+\newblock arXiv:2306.00978.
+
+\bibitem[Lin et~al.(2025)Lin, Tang, Yang, Zhang, Xiao, Gan, and
+  Han]{lin2025qserve}
+Yujun Lin, Haotian Tang, Shang Yang, Zhekai Zhang, Guangxuan Xiao, Chuang Gan,
+  and Song Han.
+\newblock {QServe}: {W4A8KV4} quantization and system co-design for efficient
+  {LLM} serving.
+\newblock In \emph{Machine Learning and Systems (MLSys)}, 2025.
+\newblock arXiv:2405.04532.
+
+\bibitem[{PyTorch Team}({\natexlab{a}})]{pytorch_numerical}
+{PyTorch Team}.
+\newblock {PyTorch} documentation: Numerical accuracy.
+\newblock
+  \url{https://docs.pytorch.org/docs/stable/notes/numerical_accuracy.html},
+  {\natexlab{a}}.
+\newblock Accessed 2026.
+
+\bibitem[{PyTorch Team}({\natexlab{b}})]{pytorch_reproducibility}
+{PyTorch Team}.
+\newblock {PyTorch} documentation: Reproducibility.
+\newblock \url{https://docs.pytorch.org/docs/stable/notes/randomness.html},
+  {\natexlab{b}}.
+\newblock Accessed 2026.
+
+\bibitem[Shao et~al.(2024)Shao, Chen, Zhang, Xu, Zhao, Li, Zhang, Gao, Qiao,
+  and Luo]{shao2024omniquant}
+Wenqi Shao, Mengzhao Chen, Zhaoyang Zhang, Peng Xu, Lirui Zhao, Zhiqian Li,
+  Kaipeng Zhang, Peng Gao, Yu~Qiao, and Ping Luo.
+\newblock {OmniQuant}: Omnidirectionally calibrated quantization for large
+  language models.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+\newblock arXiv:2308.13137.
+
+\bibitem[{Thinking Machines Lab}(2025)]{he2025nondeterminism}
+{Thinking Machines Lab}.
+\newblock Defeating nondeterminism in {LLM} inference.
+\newblock
+  \url{https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/},
+  2025.
+
+\bibitem[Wang et~al.(2023)Wang, Ma, Dong, Huang, Wang, Ma, Yang, Wang, Wu, and
+  Wei]{wang2023bitnet}
+Hongyu Wang, Shuming Ma, Li~Dong, Shaohan Huang, Huaijie Wang, Lingxiao Ma, Fan
+  Yang, Ruiping Wang, Yi~Wu, and Furu Wei.
+\newblock {BitNet}: Scaling 1-bit transformers for large language models.
+\newblock \emph{arXiv preprint arXiv:2310.11453}, 2023.
+
+\bibitem[Xiao et~al.(2023)Xiao, Lin, Seznec, Wu, Demouth, and
+  Han]{xiao2023smoothquant}
+Guangxuan Xiao, Ji~Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han.
+\newblock {SmoothQuant}: Accurate and efficient post-training quantization for
+  large language models.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2023.
+
+\bibitem[Yao et~al.(2022)Yao, Yazdani~Aminabadi, Zhang, Wu, Li, and
+  He]{yao2022zeroquant}
+Zhewei Yao, Reza Yazdani~Aminabadi, Minjia Zhang, Xiaoxia Wu, Conglong Li, and
+  Yuxiong He.
+\newblock {ZeroQuant}: Efficient and affordable post-training quantization for
+  large-scale transformers.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2022.
+\newblock arXiv:2206.01861.
+
+\bibitem[Yu et~al.(2022)]{yu2022crossplatform}
+Dailan Yu et~al.
+\newblock Post-training quantization for cross-platform learned image
+  compression.
+\newblock \emph{arXiv preprint arXiv:2202.07513}, 2022.
+
+\bibitem[Zhao et~al.(2024)Zhao, Lin, Zhu, Ye, Chen, Zheng, Ceze, Krishnamurthy,
+  Chen, and Kasikci]{zhao2024atom}
+Yilong Zhao, Chien-Yu Lin, Kan Zhu, Zihao Ye, Lequn Chen, Size Zheng, Luis
+  Ceze, Arvind Krishnamurthy, Tianqi Chen, and Baris Kasikci.
+\newblock Atom: Low-bit quantization for efficient and accurate {LLM} serving.
+\newblock In \emph{Machine Learning and Systems (MLSys)}, 2024.
+\newblock arXiv:2310.19102.
+
+\end{thebibliography}

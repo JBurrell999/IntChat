@@ -1,0 +1,103 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\bibstyle{plainnat}
+\citation{pytorch_numerical}
+\citation{pytorch_reproducibility,he2025nondeterminism}
+\providecommand \oddpage@label [2]{}
+\jmlr@workshop{ACML 2026}
+\jmlr@title{Static Quantization Is Not a Cross-Platform Reproducibility Primitive}{Static Quantization Is Not a Cross-Platform Reproducibility Primitive:\\ A Measurement Study and an Integer-Only Design}
+\jmlr@author{\Name {Anonymous Author(s)} \Email {}\\ \addr }{\Name {Anonymous Author(s)} \Email {}\\ \addr }
+\newlabel{jmlrstart}{{}{}{}{Doc-Start}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{}{section.0.1}\protected@file@percent }
+\citation{kim2021ibert}
+\citation{li2023ivit}
+\citation{wang2023bitnet}
+\citation{jacob2018quantization}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Motivation and Problem Statement}{}{section.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Definitions.}{}{section*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why batch shape and platform matter.}{}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Research question.}{}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Related Work}{}{section.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Integer-only Transformers.}{}{section*.4}\protected@file@percent }
+\citation{dettmers2022llmint8}
+\citation{xiao2023smoothquant}
+\citation{yao2022zeroquant}
+\citation{shao2024omniquant}
+\citation{ashkboos2024quarot}
+\citation{frantar2023gptq}
+\citation{lin2024awq}
+\citation{dettmers2024spqr}
+\citation{egiazarian2024aqlm}
+\citation{zhao2024atom}
+\citation{lin2025qserve}
+\citation{yu2022crossplatform}
+\citation{pytorch_numerical,pytorch_reproducibility}
+\citation{he2025nondeterminism}
+\citation{karpathy2025nanochat}
+\@writefile{toc}{\contentsline {paragraph}{LLM post-training quantization.}{}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Cross-platform consistency and framework guidance.}{}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}NanoChat W8A8 Prototype}{}{section.0.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Model.}{}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Arithmetic conditions.}{}{section*.8}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Static W8A8 linear (per-channel weights, per-tensor frozen activation).}}{}{algocf.1}\protected@file@percent }
+\newlabel{alg:w8a8}{{1}{}{Static W8A8 linear (per-channel weights, per-tensor frozen activation)}{algocf.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Claim boundary.}{}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Protocol}{}{section.0.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Outcomes.}{}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Statistics.}{}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hypotheses.}{}{section*.12}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Greedy matrix (1{,}000 generations per row). $|\Delta |$ is absolute logit difference from the FP32 batch-1 reference; KL is forward KL in nats; BPB is held-out validation fidelity. Static/dynamic W8A8 use calibration 32.}}{}{table.1}\protected@file@percent }
+\newlabel{tab:main}{{1}{}{Greedy matrix (1{,}000 generations per row). $|\Delta |$ is absolute logit difference from the FP32 batch-1 reference; KL is forward KL in nats; BPB is held-out validation fidelity. Static/dynamic W8A8 use calibration 32}{table.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{}{section.0.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A same-machine null result (H1, H2).}{}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exact batch-invariance from integer matmul (H4).}{}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Reproducibility is not fidelity (H3).}{}{section*.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph  {constant} across batch shape.}}{}{figure.1}\protected@file@percent }
+\newlabel{fig:logit}{{1}{}{Worst-case logit error vs.\ FP32 batch-1 (log scale). FP32 batch-1 is zero by construction; float error grows slightly with batch, while W8A8 error is large but \emph {constant} across batch shape}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Fidelity ablation: held-out validation BPB over 2.1M tokens.}}{}{table.2}\protected@file@percent }
+\newlabel{tab:fidelity}{{2}{}{Fidelity ablation: held-out validation BPB over 2.1M tokens}{table.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Where precision flips tokens.}{}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The central negative result: cross-platform (CPU).}{}{section*.17}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Per-category reference-match rate (batch 1). Lower means the precision flips more tokens relative to FP32.}}{}{table.3}\protected@file@percent }
+\newlabel{tab:categories}{{3}{}{Per-category reference-match rate (batch 1). Lower means the precision flips more tokens relative to FP32}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Cross-platform replication: fraction of prompts whose modal greedy token sequence is identical on GPU and CPU (batch 1).}}{}{table.4}\protected@file@percent }
+\newlabel{tab:crossplatform}{{4}{}{Cross-platform replication: fraction of prompts whose modal greedy token sequence is identical on GPU and CPU (batch 1)}{table.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Design: An Integer-Only Path to Platform Invariance}{}{section.0.7}\protected@file@percent }
+\newlabel{sec:design}{{7}{}{Design: An Integer-Only Path to Platform Invariance}{section.0.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Determinism, not compression, sets the bit-widths.}{}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Quantization-aware training with train/inference parity.}{}{section*.19}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces GPU$\leftrightarrow $CPU generation agreement. Full precision is already platform-stable at the token level; lower precision diverges, and linear-only quantization is the worst. The remaining floating-point operations prevent bitwise platform invariance.}}{}{figure.2}\protected@file@percent }
+\newlabel{fig:crossplatform}{{2}{}{GPU$\leftrightarrow $CPU generation agreement. Full precision is already platform-stable at the token level; lower precision diverges, and linear-only quantization is the worst. The remaining floating-point operations prevent bitwise platform invariance}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Op-by-op integerization of NanoChat. Widths are chosen for determinism.}}{}{table.5}\protected@file@percent }
+\newlabel{tab:intspec}{{5}{}{Op-by-op integerization of NanoChat. Widths are chosen for determinism}{table.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Expected outcome and the determinism metric.}{}{section*.20}\protected@file@percent }
+\bibdata{references}
+\bibcite{ashkboos2024quarot}{{1}{2024}{{Ashkboos et~al.}}{{Ashkboos, Mohtashami, Croci, Li, Cameron, Jaggi, Alistarh, Hoefler, and Hensman}}}
+\bibcite{dettmers2022llmint8}{{2}{2022}{{Dettmers et~al.}}{{Dettmers, Lewis, Belkada, and Zettlemoyer}}}
+\bibcite{dettmers2024spqr}{{3}{2024}{{Dettmers et~al.}}{{Dettmers, Svirschevski, Egiazarian, Kuznedelev, Frantar, Ashkboos, Borzunov, Hoefler, and Alistarh}}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion, Threats, and Roadmap}{}{section.0.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A null result is informative.}{}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Threats to validity.}{}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Roadmap.}{}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{}{section.0.9}\protected@file@percent }
+\bibcite{egiazarian2024aqlm}{{4}{2024}{{Egiazarian et~al.}}{{Egiazarian, Panferov, Kuznedelev, Frantar, Babenko, and Alistarh}}}
+\bibcite{frantar2023gptq}{{5}{2023}{{Frantar et~al.}}{{Frantar, Ashkboos, Hoefler, and Alistarh}}}
+\bibcite{jacob2018quantization}{{6}{2018}{{Jacob et~al.}}{{Jacob, Kligys, Chen, Zhu, Tang, Howard, Adam, and Kalenichenko}}}
+\bibcite{karpathy2025nanochat}{{7}{2025}{{Karpathy}}{{}}}
+\bibcite{kim2021ibert}{{8}{2021}{{Kim et~al.}}{{Kim, Gholami, Yao, Mahoney, and Keutzer}}}
+\bibcite{li2023ivit}{{9}{2023}{{Li and Gu}}{{}}}
+\bibcite{lin2024awq}{{10}{2024}{{Lin et~al.}}{{Lin, Tang, Tang, Yang, Chen, Wang, Xiao, Dang, Gan, and Han}}}
+\bibcite{lin2025qserve}{{11}{2025}{{Lin et~al.}}{{Lin, Tang, Yang, Zhang, Xiao, Gan, and Han}}}
+\bibcite{pytorch_numerical}{{12}{a}{{PyTorch Team}}{{}}}
+\bibcite{pytorch_reproducibility}{{13}{b}{{PyTorch Team}}{{}}}
+\bibcite{shao2024omniquant}{{14}{2024}{{Shao et~al.}}{{Shao, Chen, Zhang, Xu, Zhao, Li, Zhang, Gao, Qiao, and Luo}}}
+\bibcite{he2025nondeterminism}{{15}{2025}{{Thinking Machines Lab}}{{}}}
+\bibcite{wang2023bitnet}{{16}{2023}{{Wang et~al.}}{{Wang, Ma, Dong, Huang, Wang, Ma, Yang, Wang, Wu, and Wei}}}
+\bibcite{xiao2023smoothquant}{{17}{2023}{{Xiao et~al.}}{{Xiao, Lin, Seznec, Wu, Demouth, and Han}}}
+\bibcite{yao2022zeroquant}{{18}{2022}{{Yao et~al.}}{{Yao, Yazdani~Aminabadi, Zhang, Wu, Li, and He}}}
+\bibcite{yu2022crossplatform}{{19}{2022}{{Yu et~al.}}{{}}}
+\bibcite{zhao2024atom}{{20}{2024}{{Zhao et~al.}}{{Zhao, Lin, Zhu, Ye, Chen, Zheng, Ceze, Krishnamurthy, Chen, and Kasikci}}}
+\newlabel{jmlrend}{{9}{}{end of Static Quantization Is Not a Cross-Platform Reproducibility Primitive}{section*.25}{}}
+\gdef \@abspage@last{11}

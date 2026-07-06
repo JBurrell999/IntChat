@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: acml26.aux
+The style file: plainnat.bst
+Database file #1: references.bib
+Warning--empty year in pytorch_numerical
+Warning--empty year in pytorch_reproducibility
+You've used 20 entries,
+            2773 wiz_defined-function locations,
+            681 strings with 9299 characters,
+and the built_in function-call counts, 11352 in all, are:
+= -- 855
+> -- 1059
+< -- 6
++ -- 357
+- -- 336
+* -- 965
+:= -- 1828
+add.period$ -- 73
+call.type$ -- 20
+change.case$ -- 171
+chr.to.int$ -- 19
+cite$ -- 42
+duplicate$ -- 434
+empty$ -- 763
+format.name$ -- 359
+if$ -- 2307
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 16
+newline$ -- 121
+num.names$ -- 80
+pop$ -- 410
+preamble$ -- 1
+purify$ -- 151
+quote$ -- 0
+skip$ -- 345
+stack$ -- 0
+substring$ -- 40
+swap$ -- 36
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 220
+warning$ -- 2
+while$ -- 60
+width$ -- 0
+write$ -- 273
+(There were 2 warnings)
